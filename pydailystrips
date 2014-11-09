@@ -1,0 +1,72 @@
+import sys, getopt, time
+
+strips = {}
+
+def GetStrip(name):
+	
+	request = urllib2.Request(url)
+	request.add_header("User-Agent", "Python Daily Strips") 
+	#request.add_header("Host", "he.wikisource.org")
+	request.add_header("Accept", "text/html,text/json")
+	resp = urllib2.urlopen(request)
+
+def init():
+	#defs = open("strips.def", "r")
+	#tel = {'jack': 4098, 'sape': 4139}	
+	#for each line until end
+	with open("strips.def", "r") as defs:
+		strip = {}
+    		for line in defs:
+			line = line.strip()
+			if (not line):
+				continue
+			if (line.startswith('#')):
+				print "X: comment"
+				continue
+			if (line.startswith("end")):
+				print "X: ending "+strip['name']
+				strips[strip['name']] = strip['name']
+				strip = {}
+				continue
+			if (line.startswith("strip")):
+				print "X: strip begin"
+				id, name = line.split(" ", 1)
+				strip['name'] = name
+			elif (line.startswith("class")):
+				#not handled yet
+				id, call = line.split(" ", 1)
+				strip['name'] = call
+				print "new class named "+strip['name']
+			else:
+				print "X "+line.strip()
+				prop, val = line.split(" ", 1)
+				strip[prop] = val
+
+def printFooter(outfile):
+	with open(outfile, "a") as myfile:
+		myfile.write("generated at "+time.asctime(time.localtime(time.time())))
+		myfile.write("powered by <a href=\"https://github.com/bachrach44/pydailystrips\">py daily strips</a>\n</body></html>\n")
+
+def printHeader(outfile):
+	with open(outfile, "w") as myfile:
+		myfile.write("<html><head><title>Python Daily Strips</title></head>\n<body><b>Python Daily Strips</b><br />")
+
+def main(argv):
+	#will call app with list of strips and possible opts
+	#process some options (output)
+	opts, args = getopt.getopt(argv[1:],"o:",["output="])
+	outfile = "index.html"
+	for opt, arg in opts:
+		#print opt+" "+arg
+		if opt in ("-o", "--output"):
+			outfile = arg
+	#load classes from def file
+	init()
+	printHeader(outfile)
+	#for each strip passed in
+	  #find class file, get the image, 
+	  #add img to output
+	printFooter(outfile)
+
+main(sys.argv)
+
