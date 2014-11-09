@@ -1,72 +1,102 @@
-import sys, getopt, time
+import sys, getopt, time, urllib2, re
 
-strips = {}
+outfile = "index.html"
 
-def GetStrip(name):
-	
-	request = urllib2.Request(url)
-	request.add_header("User-Agent", "Python Daily Strips") 
-	#request.add_header("Host", "he.wikisource.org")
-	request.add_header("Accept", "text/html,text/json")
-	resp = urllib2.urlopen(request)
+def GetStrip(name, data):
+	#print name
+	#print data
+	#add in homepage later
+	html = "<b>"+data.get('name')+"</b> by "+data.get('artist')+"<br /><br />\n"
+	if (data['type'].startswith('search')):
+		url = data.get('homepage')
+		if (data.get('baseurl')):
+			url = data.get('baseurl')
+		request = urllib2.Request(url)
+		request.add_header("User-Agent", "Python Daily Strips") 
+		request.add_header("Accept", "text/html")
+		resp = urllib2.urlopen(request)
+		page = resp.read()
+		pattern = re.compile(data.get('searchpattern'))
+		#print pattern
+		if (pattern.search(page)):
+			html += "<img src=\""
+			print "yes!"
+			matches = pattern.findall(page)
+			if (data.get('baseurl')):
+				html += str(data.get('baseurl'))+matches[0]
+			else:
+				html += str(matches[0])
+			html += "\" /><br /><br />\n\n"
+		else:
+			html += "Couldn't find regex in page<br /><br />\n"
+	elif (data['type'].startswith('generate')):
+		return html+"not done yet<br />\n"
+	else:
+		return html+"Type of comic not supported<br>\n"
+	return html
+
+def getStrips(toget, strips):
+	html = 'Could not find strip in strips.def file'
+	for s in toget:
+		html = GetStrip(s, strips.get(s))
+		with open(outfile, "a") as myfile:
+			myfile.write(html)
 
 def init():
-	#defs = open("strips.def", "r")
-	#tel = {'jack': 4098, 'sape': 4139}	
-	#for each line until end
+	strips = {}
 	with open("strips.def", "r") as defs:
 		strip = {}
+		title = ''
     		for line in defs:
 			line = line.strip()
 			if (not line):
 				continue
 			if (line.startswith('#')):
-				print "X: comment"
 				continue
 			if (line.startswith("end")):
-				print "X: ending "+strip['name']
-				strips[strip['name']] = strip['name']
+				strips[title] = strip
 				strip = {}
+				title=''
 				continue
 			if (line.startswith("strip")):
-				print "X: strip begin"
 				id, name = line.split(" ", 1)
-				strip['name'] = name
+				title = name
+				#print "strip begin "+strip['name']
 			elif (line.startswith("class")):
 				#not handled yet
 				id, call = line.split(" ", 1)
-				strip['name'] = call
-				print "new class named "+strip['name']
+				title = call
 			else:
-				print "X "+line.strip()
 				prop, val = line.split(" ", 1)
 				strip[prop] = val
+	return strips
 
-def printFooter(outfile):
+def printFooter():
 	with open(outfile, "a") as myfile:
-		myfile.write("generated at "+time.asctime(time.localtime(time.time())))
+		myfile.write("generated at "+time.asctime(time.localtime(time.time()))+"<br />\n")
 		myfile.write("powered by <a href=\"https://github.com/bachrach44/pydailystrips\">py daily strips</a>\n</body></html>\n")
 
-def printHeader(outfile):
+def printHeader():
 	with open(outfile, "w") as myfile:
-		myfile.write("<html><head><title>Python Daily Strips</title></head>\n<body><b>Python Daily Strips</b><br />")
+		myfile.write("<html><head><title>Python Daily Strips</title></head>\n<body><b>Python Daily Strips</b><br />\n\n")
 
 def main(argv):
 	#will call app with list of strips and possible opts
 	#process some options (output)
 	opts, args = getopt.getopt(argv[1:],"o:",["output="])
-	outfile = "index.html"
 	for opt, arg in opts:
 		#print opt+" "+arg
 		if opt in ("-o", "--output"):
 			outfile = arg
 	#load classes from def file
-	init()
-	printHeader(outfile)
-	#for each strip passed in
-	  #find class file, get the image, 
-	  #add img to output
-	printFooter(outfile)
+	strips = init()
+	printHeader()
+
+	#toget = list of input strips
+	toget = ['smbc', 'test', 'evilcomic', 'dilbert']
+	getStrips(toget, strips)
+
+	printFooter()
 
 main(sys.argv)
 
