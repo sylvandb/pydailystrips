@@ -82,17 +82,24 @@ def printHeader():
 
 def main(argv):
 	#will call app with list of strips and possible opts
-	#process some options (output)
+	#process some options (output, input)
+	infile = ""
 	opts, args = getopt.getopt(argv[1:],"o:",["output="])
 	for opt, arg in opts:
 		#print opt+" "+arg
 		if opt in ("-o", "--output"):
 			outfile = arg
+		if opt in ("-i", "--input"):
+			infile = arg
 	#load classes from def file
 	strips = init()
 	printHeader()
 
 	#toget = list of input strips
+	if (infile):
+		#load toget from infile
+	else:
+		#load toget from command line
 	toget = ['smbc', 'test', 'evilcomic', 'dilbert']
 	getStrips(toget, strips)
 
