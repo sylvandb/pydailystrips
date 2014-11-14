@@ -1,26 +1,42 @@
-import sys, getopt, time, urllib2, re
+import sys, getopt, time, urllib2, re, argparse
 
-outfile = "index.html"
+outfile = ""
 
-def GetStrip(name, data):
-	#print name
-	#print data
+def classType(name, data, cl):
+	artist = getArtist(data)
+	#handle vars in class def
+	for val in data:
+		if ("$" in val):
+			for v in cl:
+				cl[v] = str.replace(cl[v], val, data[val])
+	for v in cl:
+		if ("$" in cl[v]):
+			for val in data:
+				cl[v] = str.replace(cl[v], "$"+val, data[val])
+	return stripType(name, cl)
+	
+def getArtist(data):
+	if ('artist' in data):
+		return data['artist']
+	else:
+		return ""
+
+def stripType(name, data):
 	#add in homepage later
-	html = "<b>"+data.get('name')+"</b> by "+data.get('artist')+"<br /><br />\n"
+	artist = getArtist(data)
+	html = "<b>"+str(data.get('name'))+"</b> by "+artist+"<br /><br />\n"
 	if (data['type'].startswith('search')):
 		url = data.get('homepage')
 		if (data.get('baseurl')):
 			url = data.get('baseurl')
 		request = urllib2.Request(url)
-		request.add_header("User-Agent", "Python Daily Strips") 
+		request.add_header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/37.0.2062.120 Chrome/37.0.2062.120 Safari/537.36") 
 		request.add_header("Accept", "text/html")
 		resp = urllib2.urlopen(request)
 		page = resp.read()
 		pattern = re.compile(data.get('searchpattern'))
-		#print pattern
 		if (pattern.search(page)):
 			html += "<img src=\""
-			print "yes!"
 			matches = pattern.findall(page)
 			if (data.get('baseurl')):
 				html += str(data.get('baseurl'))+matches[0]
@@ -30,17 +46,31 @@ def GetStrip(name, data):
 		else:
 			html += "Couldn't find regex in page<br /><br />\n"
 	elif (data['type'].startswith('generate')):
-		return html+"not done yet<br />\n"
+		image = data['imageurl']
+		image = str.replace(image, "%Y",time.strftime("%Y"))
+		image = str.replace(image, "%y",time.strftime("%y"))
+		image = str.replace(image, "%m",time.strftime("%m"))
+		image = str.replace(image, "%d",time.strftime("%d"))
+		html += "<img src=\""+image+"\" /><br />\n\n"
 	else:
-		return html+"Type of comic not supported<br>\n"
+		return html+"Say what? Couldn't understand the strip type<br />\n"
 	return html
 
 def getStrips(toget, strips):
-	html = 'Could not find strip in strips.def file'
 	for s in toget:
-		html = GetStrip(s, strips.get(s))
-		with open(outfile, "a") as myfile:
-			myfile.write(html)
+		if (s in strips):
+			strip = strips.get(s)
+			if ('useclass' in strip):
+				html = classType(s, strip, strips.get(strip['useclass']))
+			elif('type' in strip):
+				html = stripType(s, strip)
+			else:
+				html = "could not understand strip definition.<br />\n\n"		
+			with open(outfile, "a") as myfile:
+				myfile.write(html)
+		else:
+			with open(outfile, "a") as myfile:
+				myfile.write('Could not find strip %s in strips.def file<br />\n\n' %(s))
 
 def init():
 	strips = {}
@@ -62,8 +92,8 @@ def init():
 				id, name = line.split(" ", 1)
 				title = name
 				#print "strip begin "+strip['name']
+				strip['strip'] = name
 			elif (line.startswith("class")):
-				#not handled yet
 				id, call = line.split(" ", 1)
 				title = call
 			else:
@@ -89,32 +119,51 @@ def main(argv):
 	#will call app with list of strips and possible opts
 	#process some options (output, input)
 	infile = ""
-	opts, args = getopt.getopt(argv[1:],"i:o:",["input=","output="])
-	for opt, arg in opts:
-		#print opt+" "+arg
-		if opt in ("-o", "--output"):
-			outfile = arg
-		if opt in ("-i", "--input"):
-			infile = arg
+	global outfile
+	outfile = "index.html"
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-o", "--output", help="output file to write to")
+	parser.add_argument("-i", "--input", help="input file to read from")
+	parser.add_argument("-v", "--version", help="print version and exit", action="store_true")
+	parser.add_argument("strips", metavar='strips', nargs='?', help='strips to load, separated by spaces')
+	args = parser.parse_args()
+	if (args.version):
+		print "Are you kidding? This isn't even beta. What are you even doing looking at this?"
+		exit(0)
+	if (args.input):
+		print "in"
+    		infile = args.input
+	if (args.output):
+		print "out"
+		outfile = args.output
 	#load classes from def file
 	strips = init()
-	printHeader()
 
-	#toget = list of input strips
 	toget = []
 	if (infile):
-		print "infile"
 		#load toget from infile
 		toget = loadFromFile(infile)
 
 	else:
-		#load toget from command line (for now fake it)
-		#toget = ['smbc', 'test', 'evilcomic', 'dilbert']
-		toget = ['test']
-	print "toget: "+str(toget)
-	getStrips(toget, strips)
+		#load toget from command line
+		toget = args.strips.split()
 
+	printHeader()
+	getStrips(toget, strips)
 	printFooter()
 
 main(sys.argv)
+
+#other options I should consider supporting (from dailystrips)
+#   quiet|q  verbose   local|l   noindex   archive|a   dailydir|d   stripdir   save|s
+#   nostale   date=s   new|n   defs=s   nopersonal   basedir=s   list   proxy=s
+#   proxyauth=s   noenvproxy   nospaces   useragent=s   random   nosystem   stripnav
+#   nosymlinks   titles=s   retries=s   clean=s   updates=s   noupdates
+#
+#Options supported by dailystrips that I have no plan on supporting
+#avantgo, lite
+
+
+
+
 
