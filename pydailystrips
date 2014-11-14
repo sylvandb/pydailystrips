@@ -1,16 +1,20 @@
 import sys, getopt, time, urllib2, re, argparse
 
-#TODO: handle 4xx errors returns by urllib2
-#add link to strip homepage
+#TODO: 
+#handle 4xx errors returns by urllib2
 #alt tags
-#some sort of logging
 #make the output page look nicer
+#check version, link to update if not up to date
+#more than one strip on command line
+#is prefetch still needed?
 
 outfile = ""
 
 def classType(name, data, cl):
 	newstrip = {}
 	#copy data from cl to newstrip
+	if (not cl):
+		return "can't find class %s for strip %s<br /><br />\n\n" %(data.get('useclass'), name)
 	for v in cl:
 		if ("$" in cl[v]):
 			for val in data:
@@ -33,15 +37,20 @@ def getArtist(data):
 	else:
 		return ''
 
+def getTitle(data):
+	txt = ''
+	if (data.get('homepage')):
+		txt +='<b><a href=\"%s\">%s</a></b>' %(data.get('homepage'), data.get('name'))
+	else:
+		txt += '<b>%s</b>' %(str(data.get('name')))
+	return txt
+
 def stripType(name, data):
-	#add in homepage later
-	artist = getArtist(data)
-	html = "<b>"+str(data.get('name'))+"</b>"+artist+"<br /><br />\n"
+	html = getTitle(data)+getArtist(data)+"<br /><br />\n"
 	if (data['type'].startswith('search')):
 		url = data.get('homepage')
 		if (data.get('searchpage')):
 			url = data.get('searchpage')
-		print url
 		request = urllib2.Request(url)
 		request.add_header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/37.0.2062.120 Chrome/37.0.2062.120 Safari/537.36") 
 		request.add_header("Accept", "text/html")
@@ -57,7 +66,7 @@ def stripType(name, data):
 				html += m.group()
 			html += "\" /><br /><br />\n\n"
 		else:
-			html += "Couldn't find regex in page<br /><br />\n"
+			html += 'Could not find regex in page %s<br /><br />\n' %(url)
 			#log error
 	elif (data['type'].startswith('generate')):
 		image = data['imageurl']

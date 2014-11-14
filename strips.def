@@ -8,7 +8,12 @@ class ucomics-srch
 	provides latest
 end
 
-   	   
+class arcamax   
+	type search
+	homepage http://www.arcamax.com/thefunnies/$strip/
+	searchpage http://www.arcamax.com/thefunnies/$strip/
+	searchpattern http:\/\/www.arcamax.com\/newspics\/\d*\/\d*/\d*\.gif
+end
 class ucomics-gen
 	homepage http://www.gocomics.com/$strip/
 	type search
@@ -20,7 +25,6 @@ class unitedmedia-srch-comics
 	homepage http://www.gocomics.com/$strip/
 	type search
 	searchpage http://www.gocomics.com/$strip/
-#	searchpattern \<meta\ property\=\"og\:image\"\ content\=\"(http\:\/\/assets\.amuniversal\.com\/[0-9a-z]*)
 	searchpattern http\:\/\/assets\.amuniversal\.com\/[0-9a-z]*
 	provides any
 end
@@ -181,13 +185,6 @@ strip avalonhigh
 	baseurl $homepage
 	provides latest
 end
-strip drfun
-	name Doctor Fun
-	homepage http://www.ibiblio.org/Dave/Dr-Fun/html/
-	type generate
-	imageurl http://www.ibiblio.org/Dave/Dr-Fun/latest.jpg
-	provides latest
-end
 strip goats
 	name Goats
 	homepage http://www.goats.com/
@@ -236,14 +233,6 @@ strip mostlybusiness
 	imageurl http://www.tedgoff.com/mb/images/today.gif
 	provides latest
 end
-# website gone (?) 2002-05-24
-#strip notquiteright
-#	name Not Quite Right
-#	homepage http://www.notquiteright.com/
-#	type generate
-#	imageurl http://www.notquiteright.com/wow/todaystoon.gif
-#	provides latest
-#end
 strip pennyarcade
 	name Penny Arcade
 	homepage http://www.penny-arcade.com/
@@ -261,16 +250,6 @@ strip plif
       imageurl http://www.plif.com/thisweek.gif
       provides latest
 end
-# gone? 2002-04-02
-#strip punc
-#	name Punc & Mark
-#	homepage http://byteus.com/pm/
-#	type search
-#	searchpage http://artiztik.com/cgi-bin/pmviewer.cgi?list=pm&config=pm.cfg&slide=999&style=pm
-#	searchpattern <img.+?src=(/pm/strips/.+?\.jpg)
-#	baseurl http://artiztik.com/
-#	provides latest
-#end
 strip pvp
 	name Player vs. Player
 	homepage http://www.pvponline.com/
@@ -315,15 +294,6 @@ strip sluggy
 	baseurl http://www.sluggy.com
 	provides any
 end
-strip cna
-	name Casey and Andy
-	homepage http://www.galactanet.com/comic/
-	type search
-	searchpage http://www.galactanet.com/comic/index.htm
-	searchpattern (Strip\d\d\d.gif)
-	baseurl http://www.galactanet.com/comic/
-	provides any
-end
 strip girlgenius
 	name Girl Genius 101 (M-W-F)
 	artist Phil Foglio
@@ -365,24 +335,6 @@ strip userfriendly
 	searchpattern <img.+?src="(http://www.userfriendly.org/cartoons/archives/%y.+?/uf.+?\.gif)"
 	provides any
 end
-# done
-#strip exploitnow
-#	name Exploitation Now
-#	homepage http://www.exploitationnow.com/
-#	type search
-#	searchpattern <IMG.+?SRC="(/comics/rbw\d+\..+?)"
-#	baseurl $homepage
-#	provides latest
-#end
-#nothing new since april 2002 - ruled dead
-#strip coolcat
-#	name Cool Cat Studio
-#	homepage http://www.coolcatstudio.com/
-#	type search
-#	searchpattern <IMG.+?SRC="(/comics/ccs\d+\..+?)"
-#	baseurl http://www.coolcatstudio.com/
-#	provides latest
-#end
 strip classm
 	name The Class Menagerie
 	homepage http://www.theclassm.com/
@@ -430,14 +382,6 @@ strip angst
 	imageurl http://www.inktank.com/images/AT/cartoons/%m-%d-%y.gif
 	provides any
 end
-# superceded by kscarborough's
-#strip zapiro
-#	name Zapiro
-#	homepage http://www.mg.co.za/mg/zapiro/
-#	type generate
-#	imageurl http://www.chico.mweb.co.za/images/zapiro/%y-<code:lc(strftime("\%b", @localtime_today))>%d.gif
-#	provides any
-#end
 strip clanofthecats
 	name Clan of the cats
 	homepage http://www.clanofthecats.com/
@@ -549,15 +493,6 @@ strip adventurers
 	imageurl http://www.adventurers-comic.com/comics/adventurers%Y%m%da.gif
 	provides any
 end
-# discontinued 2002-05-24
-# may be updated to download old strips
-#strip basement
-#	name Basement Studios
-#	homepage http://www.basement-studios.com/
-#	type generate
-#	imageurl http://www.basement-studios.com/archive/images/%m%d%y.gif
-#	provides any
-#end
 strip btaf
 	name Bob, The Angry Flower
 	homepage http://angryflower.com/
@@ -715,15 +650,8 @@ strip spiderman
 end
 strip zits
 	name zits
-	homepage http://www.kingfeatures.com/features/comics/zits/aboutMain.htm
-	type search
-	searchpage http://www.kingfeatures.com/features/comics/zits/aboutMaina.php
-	searchpattern <img.+?src='(http://est.rbma.com/content/Zits\?date=\d{8})'
-	prefetch http://www.kingfeatures.com/features/comics/zits/subnav.htm
-	prefetch http://www.kingfeatures.com/features/comics/zits/aboutMain.htm
-	prefetch http://www.kingfeatures.com/features/comics/zits/aboutMaina.php
-	prefetch http://www.kingfeatures.com/images/clear.gif
-	provides any
+	homepage http://zitscomics.com/
+	useclass arcamax
 end
 strip babyblues
 	name Baby Blues
@@ -743,7 +671,7 @@ strip phdcomics
 	homepage http://www.phdcomics.com
 	type search
 	searchpage http://www.phdcomics.com/comics.php
-	searchpattern <img.src=(http://www.phdcomics.com/comics/archive/phd\d{6}s.gif)
+	searchpattern http://www.phdcomics.com/comics/archive/phd\d{6}s.gif
 	provides any
 end
 # can be made into a class
@@ -1114,7 +1042,7 @@ strip somethingpositive
 	artist R.K. Milholland
 	homepage http://www.somethingpositive.net
 	type search
-	searchpattern src="(sp\d\d\d\d%Ya?.png)
+	searchpattern sp\d\d\d\d\d\d\d\da?.png
 	baseurl http://www.somethingpositive.net/
 	provides latest
 end
@@ -1126,22 +1054,13 @@ strip fullfrontalnerdity
 	searchpattern <img src="(http://nodwick.humor.gamespy.com/ffn/strips/\d\d\d\d-\d\d-\d\d.jpg)">
 	provides latest
 end
-strip evilcomic
+strip evilinc
 	name Evil Inc.
 	artist Brad Guigar
 	homepage http://www.evil-comic.com
 	type search
-	searchpattern src="(/comics/e.........(gif|jpg))"
-	baseurl http://www.evil-comic.com
+	searchpattern http:\/\/.+\/evil\-inc\.com\/wp-content\/uploads\/\d\d\d\d\/\d\d\/\d{8}\.jpg
 	provides latest
-end
-strip test
-	name Ari's comic test
-	artist Ari E-B
-	homepage http://www.elias-bachrach.com/
-	type search
-	searchpattern fampic....
-	baseurl http://www.elias-bachrach.com/
 end
 strip smbc
 	name Saturday morning breakfast cereal 
@@ -1152,11 +1071,11 @@ strip smbc
 	provides latest
 end
 strip smbcafter
-	name Saturday morning breakfast cereal second cartoon (some days)
+	name Saturday morning breakfast cereal second cartoon (most days)
 	artist Zack Weiner
 	homepage http://www.smbc-comics.com
 	type generate
-	imageurl http://www.smbc-comics.com/comics/%Y%m%dafter.gif
+	imageurl http://www.smbc-comics.com/comics/%Y%m%dafter.png
 	provides latest
 end
 strip xkcd
