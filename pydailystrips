@@ -80,11 +80,16 @@ def printHeader():
 	with open(outfile, "w") as myfile:
 		myfile.write("<html><head><title>Python Daily Strips</title></head>\n<body><b>Python Daily Strips</b><br />\n\n")
 
+def loadFromFile(filename):
+	with open (filename, "r") as myfile:
+		text = myfile.read()
+	return text.split()
+
 def main(argv):
 	#will call app with list of strips and possible opts
 	#process some options (output, input)
 	infile = ""
-	opts, args = getopt.getopt(argv[1:],"o:",["output="])
+	opts, args = getopt.getopt(argv[1:],"i:o:",["input=","output="])
 	for opt, arg in opts:
 		#print opt+" "+arg
 		if opt in ("-o", "--output"):
@@ -96,11 +101,17 @@ def main(argv):
 	printHeader()
 
 	#toget = list of input strips
+	toget = []
 	if (infile):
+		print "infile"
 		#load toget from infile
+		toget = loadFromFile(infile)
+
 	else:
-		#load toget from command line
-	toget = ['smbc', 'test', 'evilcomic', 'dilbert']
+		#load toget from command line (for now fake it)
+		#toget = ['smbc', 'test', 'evilcomic', 'dilbert']
+		toget = ['test']
+	print "toget: "+str(toget)
 	getStrips(toget, strips)
 
 	printFooter()
