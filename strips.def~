@@ -327,10 +327,10 @@ end
 strip girlgenius
 	name Girl Genius 101 (M-W-F)
 	artist Phil Foglio
-	homepage http://www.girlgeniusonline.com/
+	homepage http://www.girlgeniusonline.com/comic.php
 	type search
 	searchpage http://www.girlgeniusonline.com/comic.php
-	searchpattern http://www.girlgeniusonline.com/ggmain/strips/ggmain\d\d\d\d\d\d\d\d.?.jpg
+	searchpattern http://www.girlgeniusonline.com/ggmain/strips/ggmain%Y\d\d\d\d.?.jpg
 	provides latest
 end
 # only updated M-F, but no better way to handle it
