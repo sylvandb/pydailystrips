@@ -1,13 +1,7 @@
 # Strip Groups
 # Class definitions
-class ucomics-srch
-	homepage http://www.ucomics.com/$strip/view$1.htm
-	type search
-	searchpattern <img.+?src=".+?(/$1/(\d+)/$1(\d+).+?)"
-	baseurl http://images.ucomics.com/comics
-	provides latest
-end
 
+#these classes are good, but do not necesarilly have all the strips they provide defined
 class arcamax   
 	type search
 	homepage http://www.arcamax.com/thefunnies/$strip/
@@ -21,6 +15,17 @@ class ucomics-gen
 	searchpattern http://assets.amuniversal.com/[0-9a-f]{32}
 	provides any
 end
+
+#these classes have not been tested yet
+
+class ucomics-srch
+	homepage http://www.ucomics.com/$strip/view$1.htm
+	type search
+	searchpattern <img.+?src=".+?(/$1/(\d+)/$1(\d+).+?)"
+	baseurl http://images.ucomics.com/comics
+	provides latest
+end
+
 class unitedmedia-srch-comics
 	homepage http://www.gocomics.com/$strip/
 	type search
@@ -649,21 +654,13 @@ strip spiderman
 	prefetch http://www.kingfeatures.com/features/comics/spidermn/about.htm
 end
 strip zits
-	name zits
+	name Zits
 	homepage http://zitscomics.com/
 	useclass arcamax
 end
 strip babyblues
 	name Baby Blues
-	homepage http://www.kingfeatures.com/features/comics/babyblue/about.htm
-	type search
-	prefetch http://www.kingfeatures.com/features/comics/babyblue/subnav.htm
-	prefetch http://www.kingfeatures.com/features/comics/babyblue/about.htm
-	prefetch http://www.kingfeatures.com/images/clear.gif
-	prefetch http://www.kingfeatures.com/features/comics/babyblue/aboutMaina.php
-	searchpage http://www.kingfeatures.com/features/comics/babyblue/aboutMaina.php
-	searchpattern <img.+?src='(http://est.rbma.com/content/Baby_Blues\?date=\d{8})'
-	provides any
+	useclass arcamax
 end
 strip phdcomics
 	name PHD Comics
