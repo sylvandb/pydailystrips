@@ -1,12 +1,9 @@
 import sys, getopt, time, urllib2, re, argparse
 
 #TODO: 
-#handle 4xx errors returns by urllib2
-#alt tags
-#make the output page look nicer
+#alt tags?
 #check version, link to update if not up to date
 #more than one strip on command line
-#is prefetch still needed?
 
 outfile = ""
 
@@ -16,19 +13,20 @@ def classType(name, data, cl):
 	if (not cl):
 		return "can't find class %s for strip %s<br /><br />\n\n" %(data.get('useclass'), name)
 	for v in cl:
+		#variables in class def
 		if ("$" in cl[v]):
 			for val in data:
 				newstrip[v] = str.replace(cl[v], "$"+val, data[val])
 		else:
 			newstrip[v] = cl[v]
 	for val in data:
+		#variables in strip def
 		if ("$" in val):
-			for v in cl:
-				newstrip[v] = str.replace(cl[v], val, data[val])
+			for v in newstrip:
+				newstrip[v] = str.replace(newstrip[v], val, data[val])
 		else:
 			#add in props from strip that don't exist in class. Overwright if they do
 			newstrip[val] = data[val]
-
 	return stripType(name, newstrip)
 	
 def getArtist(data):
@@ -40,44 +38,60 @@ def getArtist(data):
 def getTitle(data):
 	txt = ''
 	if (data.get('homepage')):
-		txt +='<b><a href=\"%s\">%s</a></b>' %(data.get('homepage'), data.get('name'))
+		txt +='<b><a href=\"%s\">%s</a></b>' %(stringsubs(data.get('homepage')), data.get('name'))
 	else:
-		txt += '<b>%s</b>' %(str(data.get('name')))
+		txt += '<b>%s</b>' %(stringsubs(str(data.get('name'))))
 	return txt
 
 def stripType(name, data):
-	html = getTitle(data)+getArtist(data)+"<br /><br />\n"
+	html = getTitle(data)+getArtist(data)+"<br />\n"
 	if (data['type'].startswith('search')):
 		url = data.get('homepage')
 		if (data.get('searchpage')):
 			url = data.get('searchpage')
+		url = stringsubs(url)
 		request = urllib2.Request(url)
 		request.add_header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/37.0.2062.120 Chrome/37.0.2062.120 Safari/537.36") 
 		request.add_header("Accept", "text/html")
-		resp = urllib2.urlopen(request)
-		page = resp.read()
-		pattern = re.compile(data.get('searchpattern'))
-		m = pattern.search(page)
-		if (m):
-			html += "<img src=\""
-			if (data.get('baseurl')):
-				html += str(data.get('baseurl'))+m.group()
+		request.add_header('Pragma', 'no-cache')
+		request.add_header('Cache-Control', 'no-cache')
+		request.add_header('Accept-Language', 'en-US,en;q=0.8')
+		if (data.get('referer')):
+			request.add_header("Referer", data.get('referer'))
+		try:
+			resp = urllib2.urlopen(request)
+			page = resp.read()
+			pattern = re.compile(data.get('searchpattern'))
+			m = pattern.search(page)
+			if (m):
+				html += "<img src=\""
+				if (data.get('baseurl')):
+					html += str(data.get('baseurl'))+m.group()
+				else:
+					html += m.group()
+				html += "\" /><br /><br />\n\n"
 			else:
-				html += m.group()
-			html += "\" /><br /><br />\n\n"
-		else:
-			html += 'Could not find regex in page %s<br /><br />\n' %(url)
-			#log error
+				html += 'Could not find regex in page %s<br /><br />\n' %(url)
+		except urllib2.HTTPError, err:
+			if err.code == 404:
+				html += '404 error trying to access %s.<br /><br />\n\n' %(url)
+			else:
+				html += 'error when trying to get %s. Server returned a %s error which means %s<br /><br />\n\n' %(url, err.code, err.reason)
+		except:
+			html += 'an unknown error occured while trying to access %s<br /><br/>\n\n' %(url)
 	elif (data['type'].startswith('generate')):
 		image = data['imageurl']
-		image = str.replace(image, "%Y",time.strftime("%Y"))
-		image = str.replace(image, "%y",time.strftime("%y"))
-		image = str.replace(image, "%m",time.strftime("%m"))
-		image = str.replace(image, "%d",time.strftime("%d"))
-		html += "<img src=\""+image+"\" /><br />\n\n"
+		html += "<img src=\""+stringsubs(image)+"\" /><br />\n\n"
 	else:
 		return html+"Say what? Couldn't understand the strip type<br />\n"
 	return html
+
+def stringsubs(image):
+	image = str.replace(image, "%Y",time.strftime("%Y"))
+	image = str.replace(image, "%y",time.strftime("%y"))
+	image = str.replace(image, "%m",time.strftime("%m"))
+	image = str.replace(image, "%d",time.strftime("%d"))
+	return image
 
 def getStrips(toget, strips):
 	for s in toget:
@@ -94,7 +108,7 @@ def getStrips(toget, strips):
 		else:
 			with open(outfile, "a") as myfile:
 				myfile.write('Could not find strip %s in strips.def file<br />\n\n' %(s))
-
+				print 'Could not find strip %s in strips.def file' %(s)
 def init():
 	strips = {}
 	with open("strips.def", "r") as defs:
@@ -113,9 +127,12 @@ def init():
 				continue
 			if (line.startswith("strip")):
 				id, name = line.split(" ", 1)
+				if (strips.get(name)):
+					print 'found a duplicate for %s in def file. Going with first one.' %(name)
+					continue
 				title = name
-				#print "strip begin "+strip['name']
 				strip['strip'] = name
+				#print name
 			elif (line.startswith("class")):
 				id, call = line.split(" ", 1)
 				title = call
@@ -148,7 +165,7 @@ def main(argv):
 	parser.add_argument("-o", "--output", help="output file to write to")
 	parser.add_argument("-i", "--input", help="input file to read from")
 	parser.add_argument("-v", "--version", help="print version and exit", action="store_true")
-	parser.add_argument("strips", metavar='strips', nargs='?', help='strips to load, separated by spaces')
+	parser.add_argument("strips", metavar='strips', nargs='+', help='strips to load, separated by spaces')
 	args = parser.parse_args()
 	if (args.version):
 		print "Are you kidding? This isn't even beta. What are you even doing looking at this?"
@@ -167,7 +184,7 @@ def main(argv):
 		toget = loadFromFile(infile)
 	else:
 		#load toget from command line
-		toget = args.strips.split()
+		toget = args.strips
 
 	printHeader()
 	getStrips(toget, strips)
