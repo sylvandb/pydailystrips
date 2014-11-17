@@ -3,7 +3,6 @@ import sys, getopt, time, urllib2, re, argparse
 #TODO: 
 #alt tags?
 #check version, link to update if not up to date
-#more than one strip on command line
 
 outfile = ""
 
@@ -165,7 +164,7 @@ def main(argv):
 	parser.add_argument("-o", "--output", help="output file to write to")
 	parser.add_argument("-i", "--input", help="input file to read from")
 	parser.add_argument("-v", "--version", help="print version and exit", action="store_true")
-	parser.add_argument("strips", metavar='strips', nargs='+', help='strips to load, separated by spaces')
+	parser.add_argument("strips", metavar='strips', nargs='*', help='strips to load, separated by spaces')
 	args = parser.parse_args()
 	if (args.version):
 		print "Are you kidding? This isn't even beta. What are you even doing looking at this?"
@@ -192,7 +191,7 @@ def main(argv):
 
 main(sys.argv)
 
-#other options I should consider supporting (from dailystrips)
+#other options I might consider supporting (from dailystrips)
 #   quiet|q  verbose   local|l   noindex   archive|a   dailydir|d   stripdir   save|s
 #   nostale   date=s   new|n   defs=s   nopersonal   basedir=s   list   proxy=s
 #   proxyauth=s   noenvproxy   nospaces   useragent=s   random   nosystem   stripnav
