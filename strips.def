@@ -1,5 +1,5 @@
 # Strip Groups
-# 767 strips in this file
+# 751 strips in this file
 
 ###############################
 #these classes are good, and all their strips defined
@@ -2475,17 +2475,13 @@ end
 ########
 #end universaluclick
 #comicspage.com strips
+#XXXX need to check this section
 ########
 strip brenda
 	name Brenda Starr
 	useclass comicspage-strips-gen
 	$1 brenda
 	$2 bsr
-end
-strip catswithhands
-	name Cats with Hands
-	type generate
-	imageurl http://www.mrboffo.com/comicsweb/catswithhandsweb/strips/%Y%m%dcwh_s_web.jpg
 end
 strip doodles
 	name Doodles
@@ -2626,6 +2622,11 @@ strip wright
 	$2 wrt
 end
 #additional non-standard strips
+strip catswithhands
+	name Cats with Hands
+	type generate
+	imageurl http://www.mrboffo.com/comicsweb/catswithhandsweb/strips/%Y%m%dcwh_s_web.jpg
+end
 strip dwanepowell
 	#I think this will always be the last image in the queue (and the most recent)
 	name Dwane Powell
