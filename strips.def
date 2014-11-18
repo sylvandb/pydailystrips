@@ -18,7 +18,7 @@ class comicskingdom
 	searchpattern http\:\/\/safr\.kingfeatures\.com\/idn\/ck3\/dispimg\.php\?file\=[A-Za-z0-9\?\.\=\\]+
 	referer http://comicskingdom.com/$strip/
 end
-class comicskingdom-big   
+class comicskingdom-big
 	type search
 	homepage http://comicskingdom.com/$strip/
 	searchpage http://safr.kingfeatures.com/idn/ck3/zone/js/index.php?cn=32&zn=712&fn=$fn&wt=4&fs=0&fd=%Y%m%d&null=0
@@ -37,17 +37,21 @@ class arcamax
 	searchpage http://www.arcamax.com/thefunnies/$strip/
 	searchpattern http:\/\/www.arcamax.com\/newspics\/\d*\/\d*/\d*\.(gif|jpg)
 end
-###########################################
-#these classes have not been tested yet
-###########################################
-#to make: universaluclick.com, keenspace, washingtonpost, www.creators.com
-#creators.com: donald duck, mickey mouse, long story short, recess
 class creators
 	type search
 	homepage http://www.creators.com/comics/$strip.html
 	searchpattern /comics/\d+/\d+_image.jpg
 	baseurl http://www.creators.com/
 end
+class universaluclick
+	homepage http://www.universaluclick.com/comics/$strip
+	searchpattern http://assets.amuniversal.com/[0-9a-f]{32}
+	type search
+end
+###########################################
+#these classes have not been tested yet
+###########################################
+#to make: keenspace, washingtonpost
 class sev-comics
         homepage http://www.sev.com.au/toonzone/$strip.asp
         type generate
@@ -887,10 +891,12 @@ end
 strip foxtrot
 	name FoxTrot
 	useclass gocomics
+	artist Bill Amend
 end
 strip foxtrotclassics
 	name FoxTrot Classics
 	useclass gocomics
+	artist Bill Amend
 end
 strip francis
 	name Francis
@@ -2452,8 +2458,22 @@ strip recess
 	useclass creators
 	name Recess
 end
-####
+###########
 #end creators
+#universaluclick
+###########
+strip jamesbond
+	useclass universaluclick
+	artist Ian Fleming
+	name James Bond
+end
+strip merlinsworldofmarvels
+	useclass universaluclick
+	name Merlin's World of Marvels
+	artist Knight Features
+end
+########
+#end universaluclick
 #comicspage.com strips
 ########
 strip brenda
@@ -2462,11 +2482,10 @@ strip brenda
 	$1 brenda
 	$2 bsr
 end
-strip cats
+strip catswithhands
 	name Cats with Hands
-	useclass comicspage-strips-gen
-	$1 cats
-	$2 cwh
+	type generate
+	imageurl http://www.mrboffo.com/comicsweb/catswithhandsweb/strips/%Y%m%dcwh_s_web.jpg
 end
 strip doodles
 	name Doodles
@@ -2606,133 +2625,14 @@ strip wright
 	$1 wright
 	$2 wrt
 end
-# sev.com.au strips
-strip sevtrek
-        name Sev Trek
-        useclass sev-comics
-end
-strip fotr
-        name Fraud of the Rings
-        useclass sev-comics
-end
-strip sevgate
-        name Sevgate SEV1
-        useclass sev-comics
-end
-strip bluffy
-        name Bluffy the Vampedup Stunner
-        useclass sev-comics
-end
-strip sevfiles
-        name The Sev Files
-        useclass sev-comics
-end
-strip sevwars
-        name Sev Wars
-        useclass sev-comics
-end
-strip sevylon5
-        name Sevylon 5
-        useclass sev-comics
-end
-# doesn't fit class
-strip sevscifi
-        name Sev Sci-Fi TV
-        homepage http://www.sev.com.au/toonzone/
-        type generate
-        imageurl http://www.sev.com.au/toonzone/scifitv.jpg
-        provides latest
-end
-#creators.com strips
-strip agnes
-	name Agnes
-	homepage http://www.creators.com/comics_show.cfm?comicname=agn
-	type search
-	searchpattern <img.+?alt="Agnes".+?src="(.+?)"
-	baseurl http://www.creators.com/
-	provides latest
-end
-strip bachelorparty
-	name Bachelor Party
-	homepage http://www.creators.com/comics_show.cfm?comicname=bch
-	type search
-	searchpattern <img.+?alt="Bachelor Party".+?src="(.+?)"
-	baseurl http://www.creators.com/
-	provides latest
-end
-strip charlie
-	name Charlie
-	homepage http://www.creators.com/comics_show.cfm?comicname=cha
-	type search
-	searchpattern <img.+?alt="Charlie".+?src="(.+?)"
-	baseurl http://www.creators.com/
-	provides latest
-end
-strip flightdeck
-	name Flight Deck
-	homepage http://www.creators.com/comics_show.cfm?comicname=fli
-	type search
-	searchpattern <img.+?alt="Flight Deck".+?src="(.+?)"
-	baseurl http://www.creators.com/
-	provides latest
-end
-strip flofriends
-	name Flo & Friends
-	homepage http://www.creators.com/comics_show.cfm?comicname=flo
-	type search
-	searchpattern <img.+?alt="Flo & Friends".+?src="(.+?)"
-	baseurl http://www.creators.com/
-	provides latest
-end
-strip mrhousewife
-	name Mr. Housewife
-	homepage http://www.creators.com/comics_show.cfm?comicname=mrh
-	type search
-	searchpattern <img.+?alt="Mr. Housewife".+?src="(.+?)"
-	baseurl http://www.creators.com/
-	provides latest
-end
-strip naturalselection
-	name Natural Selection
-	homepage http://www.creators.com/comics_show.cfm?comicname=nat
-	type search
-	searchpattern <img.+?alt="Natural Selection".+?src="(.+?)"
-	baseurl http://www.creators.com/
-	provides latest
-end
-strip jimmymargulies
-	name Jimmy Margulies
-	homepage http://www.creators.com/editorial_show.cfm?comicname=jm
-	type search
-	searchpattern <img.+?alt="Jimmy Margulies".+?src="(.+?)"
-	baseurl http://www.creators.com/
-	provides latest
-end
-strip dwanepowell
-	name Dwane Powell
-	homepage http://www.creators.com/editorial_show.cfm?comicname=dp
-	type search
-	searchpattern <img.+?alt="Dwane Powell".+?src="(.+?)"
-	baseurl http://www.creators.com/
-	provides latest
-end
-strip geoffreymoss
-	name Geoffrey Moss
-	homepage http://www.creators.com/editorial_show.cfm?comicname=gm
-	type search
-	searchpattern <img.+?alt="Mossprints".+?src="(.+?)"
-	baseurl http://www.creators.com/
-	provides latest
-end
-strip juliasuits
-	name Julia Suits
-	homepage http://www.creators.com/editorial_show.cfm?comicname=su
-	type search
-	searchpattern <img.+?alt="Suits".+?src="(.+?)"
-	baseurl http://www.creators.com/
-	provides latest
-end
 #additional non-standard strips
+strip dwanepowell
+	#I think this will always be the last image in the queue (and the most recent)
+	name Dwane Powell
+	homepage www.newsobserver.com/powell/
+	type generate
+	imageurl http://www.newsobserver.com/content/multimedia/interactive/powell/cartoons/powell23.jpg
+end
 strip dtte
 	name Death to the Extremist
 	homepage http://www.zole.org/extremist/
@@ -2740,7 +2640,6 @@ strip dtte
 	searchpage http://www.zole.org/extremist/
 	searchpattern <img.+?src="comics/(.+?)"
 	baseurl http://www.zole.org/extremist/comics/
-	provides latest
 end
 strip jack
 	name Jack
@@ -3137,7 +3036,6 @@ strip amores
 	$2 amr
 end
 #########
-#
 # Non-standard strips
 ##########
 #these have been tested and work
