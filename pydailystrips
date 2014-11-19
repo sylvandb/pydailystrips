@@ -108,9 +108,9 @@ def getStrips(toget, strips):
 			with open(outfile, "a") as myfile:
 				myfile.write('Could not find strip %s in strips.def file<br />\n\n' %(s))
 				print 'Could not find strip %s in strips.def file' %(s)
-def init():
+def init(deffile):
 	strips = {}
-	with open("strips.def", "r") as defs:
+	with open(deffile, "r") as defs:
 		strip = {}
 		title = ''
     		for line in defs:
@@ -164,25 +164,27 @@ def main(argv):
 	parser.add_argument("-o", "--output", help="output file to write to")
 	parser.add_argument("-i", "--input", help="input file to read from")
 	parser.add_argument("-v", "--version", help="print version and exit", action="store_true")
+	parser.add_argument("--defs", help="Path to the strip definition file")
 	parser.add_argument("strips", metavar='strips', nargs='*', help='strips to load, separated by spaces')
 	args = parser.parse_args()
 	if (args.version):
 		print "Are you kidding? This isn't even beta. What are you even doing looking at this?"
 		exit(0)
 	if (args.input):
-		#print args.input
     		infile = args.input
 	if (args.output):
-		print "out"
 		outfile = args.output
+	if (args.defs):
+		deffile = args.defs
+	else :
+		deffile = 'strips.def'
 	#load classes from def file
-	strips = init()
+	strips = init(deffile)
 
 	toget = []
 	if (infile):
 		toget = loadFromFile(infile)
 	else:
-		#load toget from command line
 		toget = args.strips
 
 	printHeader()
@@ -193,7 +195,7 @@ main(sys.argv)
 
 #other options I might consider supporting (from dailystrips)
 #   quiet|q  verbose   local|l   noindex   archive|a   dailydir|d   stripdir   save|s
-#   nostale   date=s   new|n   defs=s   nopersonal   basedir=s   list   proxy=s
+#   nostale   date=s   new|n   nopersonal   basedir=s   list   proxy=s
 #   proxyauth=s   noenvproxy   nospaces   useragent=s   random   nosystem   stripnav
 #   nosymlinks   titles=s   retries=s   clean=s   updates=s   noupdates
 #
