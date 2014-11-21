@@ -1,5 +1,5 @@
 # Strip Groups
-# 751 strips in this file
+# 736 strips in this file
 
 ###############################
 #these classes are good, and all their strips defined
@@ -590,6 +590,7 @@ end
 strip bloomcounty
 	name Bloom County
 	useclass gocomics
+	artist Berkeley Breathed
 end
 strip bonanas
 	name Bo Nanas
@@ -963,6 +964,7 @@ end
 strip getfuzzy
 	name Get Fuzzy
 	useclass gocomics
+	artist Darby Conley
 end
 strip gilthorp
 	name Gil Thorp
@@ -1435,6 +1437,7 @@ end
 strip pearlsbeforeswine
 	name Pearls Before Swine
 	useclass gocomics
+	artist Steven Pastis
 end
 strip perry-bible-fellowship
 	name Perry Bible Fellowship
@@ -2420,7 +2423,7 @@ end
 ######
 # end cagle
 #######
-#arcamax - most are procided by other providers
+#arcamax - most are provided by other providers
 #######
 strip archie
 	useclass arcamax
@@ -2585,18 +2588,6 @@ strip peters
 	$1 peters
 	$2 pet
 end
-strip sack
-	name Steve Sack
-	useclass comicspage-editorial-gen
-	$1 sack
-	$2 sak
-end
-strip sheneman
-	name Drew Sheneman
-	useclass comicspage-editorial-gen
-	$1 sheneman
-	$2 she
-end
 strip stayskal
 	name Wayne Stayskal
 	useclass comicspage-editorial-gen
@@ -2753,45 +2744,10 @@ strip barneygoogle
 	useclass azcentral-srch
 	$1 Barney_Google
 end
-strip betterhalf
-	name Better Half
-	useclass azcentral-srch
-	$1 Better_Half
-end
-strip grinandbearit
-	name Grin and Bear It
-	useclass azcentral-srch
-	$1 Grin_and_Bear_It
-end
-strip judgeparker
-	name Judge Parker
-	useclass azcentral-srch
-	$1 Judge_Parker
-end
-strip marktrail
-	name Mark Trail
-	useclass azcentral-srch
-	$1 Mark_Trail
-end
-strip maryworth
-	name Mary Worth
-	useclass azcentral-srch
-	$1 Mary_Worth
-end
-strip pardonmyplanet
-	name Pardon My Planet
-	useclass azcentral-srch
-	$1 Pardon_My_Planet
-end
 strip redeye
 	name Redeye
 	useclass azcentral-srch
 	$1 Redeye
-end
-strip rexmorgan
-	name Rex Morgan, MD
-	useclass azcentral-srch
-	$1 Rex_Morgan
 end
 strip steveroper
 	name Steve Roper
@@ -2809,20 +2765,6 @@ strip tumbleweeds
 	$1 Tumbleweeds
 end
 # more non-standard
-strip fleem
-	name fleem
-	homepage http://flem.keenspace.com/
-	type generate
-	imageurl http://flem.keenspace.com/comics/%Y%m%d.jpg
-	provides any
-end
-strip queenofwands
-	name Queen of Wands
-	homepage http://www.queenofwands.net/
-	type generate
-	imageurl http://www.queenofwands.net/comics/%Y%m%d.gif
-	provides any
-end
 strip wigu
 	name WIGU
 	artist Jeffrey Rowland
@@ -2894,9 +2836,9 @@ end
 strip ctrlaltdel
 	name Ctrl+Alt_Del (M-W-F)
 	artist Tim Buckley
-	homepage http://www.ctrlaltdel-online.com
+	homepage http://www.cad-comic.com/
 	type generate
-	imageurl http://www.ctrlaltdel-online.com/comics/%Y%m%d.jpg
+	imageurl http://www.cad-comic.com/comics/%Y%m%d.jpg
 	provides latest
 end
 strip tasteslikegravel
@@ -2915,21 +2857,13 @@ strip instantclassic
 	imageurl http://www.briworld.com/ICimages/IC%Y%m%d.jpg
 	provides any
 end
-strip geeksalad
-	name Geek Salad
-	artist Warwick Rendell
-	homepage http://www.geeksalad.net/
-	type generate
-	imageurl http://www.geeksalad.net/strips/%Y%m%d.png
-	provides any
-end
 strip reallife
 	name Real Life Comics
 	artist Greg Dean
 	homepage http://www.reallifecomics.com/
 	type search
         baseurl http://www.reallifecomics.com
-        searchpattern <img src="(/comics/\d\d\d\d/\d\d\d\d\d\d\d\d_\d\d\d\d\....)
+        searchpattern /comics/\d\d\d\d/\d\d\d\d\d\d\d\d_\d\d\d\d\....
 	provides latest
 end
 strip comet7
@@ -2946,7 +2880,7 @@ strip moviepunks
 	artist Carrington Vanston
 	homepage http://www.moviepunks.com/
 	type search
-	searchpattern (http://www.moviepunks.com/comics/\d*\.png)
+	searchpattern http://www.moviepunks.com/comics/\d*\.png
 	provides latest
 end
 strip building12
@@ -2957,20 +2891,11 @@ strip building12
 	searchpattern (http://www.building12.net/issue\d/page\d*.jpg)
 	provides latest
 end
-strip sarahanddavid
-	name Sarah And David
-	artist Alex Aberle
-	homepage http://www.sara-and-david.com/comic.php?comic=latest
-	type search
-	searchpattern (comics/\d*\.jpg)
-	baseurl http://www.sara-and-david.com/
-	provides latest
-end
 strip haiopeis
 	name Haiopeis
 	homepage http://www.drive-in-cartoons.de/haiopeis/hauptteil.php
 	type search
-	searchpattern <img src=http://www.drive-in-cartoons.de/albums/haiopeis/(\S+.png)
+	searchpattern http://www.drive-in-cartoons.de/albums/haiopeis/(\S+.png)
 	baseurl http://www.drive-in-cartoons.de/albums/haiopeis/
 	provides latest
 end
@@ -3062,7 +2987,6 @@ strip mostlybusiness
 	name Mostly Business
 	homepage http://www.tedgoff.com/
 	type generate
-	#fix to use more precise addr - maybe not possible?
 	imageurl http://www.tedgoff.com/mb/images/today.gif
 	provides latest
 end
@@ -3230,7 +3154,7 @@ strip userfriendly
 	homepage http://www.userfriendly.org/static/
 	type search
 	searchpage http://ars.userfriendly.org/cartoons/?id=%Y%m%d&mode=classic
-	searchpattern <img.+?src="(http://www.userfriendly.org/cartoons/archives/%y.+?/uf.+?\.gif)"
+	searchpattern http://www.userfriendly.org/cartoons/archives/%y.+?/uf.+?\.gif
 	provides any
 end
 strip classm
@@ -3264,14 +3188,6 @@ strip joeaverage
 	baseurl http://www.joeaverage.org/
 	provides latest
 end
-strip angst
-	name Angst Technology (Only on Mondays)
-	Artist Barry T. Smith
-	homepage http://www.inktank.com/AT/
-	type generate
-	imageurl http://www.inktank.com/images/AT/cartoons/%m-%d-%y.gif
-	provides any
-end
 strip clanofthecats
 	name Clan of the cats
 	homepage http://www.clanofthecats.com/
@@ -3288,8 +3204,8 @@ strip gpf
 	name General Protection Fault
 	homepage http://www.gpf-comics.com/
 	type search
-	searchpattern <IMG.+?SRC="(/comics/gpf\d+.+?\..+?)"
-	baseurl http://www.gpf-comics.com
+	searchpattern /comics/gpf%Y%m\d\d.....\.png
+	baseurl http://www.gpf-comics.com/
 	provides latest
 end
 strip crfh
@@ -3312,17 +3228,19 @@ strip kevinandkell
 	type generate
 	imageurl http://www.kevinandkell.com/%Y/strips/kk%Y%m%d.gif
 	provides any
+	artist Bill Holbroock
 end
 strip freefall
 	name Freefall
-	homepage http://www.purrsia.com/freefall/
-	type generate
-	imageurl $homepage<code:use POSIX;my $w=strftime("\%"."u",localtime($time_today));my $s=517+3*floor(($time_today-995839200)/604800);$s++if$w\>2;$s++if$w\>4;my$c=int(($s+99)/100);"ff${c}00/fv00$s.gif">
+	homepage http://freefall.purrsia.com/
+	type search
+	searchpattern /ff..../[a-f0-9]{7}.png
 	provides any
+	baseurl http://freefall.purrsia.com/
 end
 strip 8bit
 	name 8-Bit Theater
-	homepage http://www.nuklearpower.com/latest.php
+	homepage http://www.nuklearpower.com/8-bit-theater/
 	type search
 	searchpattern <img.+?src="(http://www.nuklearpower.com/comics/\d+\..+?)">
 	provides latest
@@ -3342,14 +3260,6 @@ strip apod
 	searchpattern <img.+?SRC="(image/\d{4}/.+?\..+?)"
 	baseurl $homepage
 	provides latest
-end
-# seems to be '....a.gif' now.
-strip adventurers
-	name Adventurers!
-	homepage http://www.adventurers-comic.com/
-	type generate
-	imageurl http://www.adventurers-comic.com/comics/adventurers%Y%m%da.gif
-	provides any
 end
 strip btaf
 	name Bob, The Angry Flower
