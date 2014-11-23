@@ -48,16 +48,8 @@ class universaluclick
 	searchpattern http://assets.amuniversal.com/[0-9a-f]{32}
 	type search
 end
-###########################################
-#these classes have not been tested yet
-###########################################
 #to make: keenspace, washingtonpost
-class sev-comics
-        homepage http://www.sev.com.au/toonzone/$strip.asp
-        type generate
-        imageurl http://www.sev.com.au/toonzone/$strip.jpg
-        provides latest
-end
+
 #############
 #comicskingdom comics. 
 #fn is a variable unique to comicskingdom.com that they use to identify the strip.
@@ -778,6 +770,7 @@ end
 strip dinosaur-comics
 	name Dinosaur Comics
 	useclass gocomics
+	artist Ryan North
 end
 strip dogeatdoug
 	name Dog Eat Doug
@@ -1771,10 +1764,6 @@ strip watchyourhead
 	name Watch Your Head
 	useclass gocomics
 end
-strip waynovision
-	name WaynoVision
-	useclass gocomics
-end
 strip weepals
 	name Wee Pals
 	useclass gocomics
@@ -2461,6 +2450,11 @@ strip recess
 	useclass creators
 	name Recess
 end
+strip doodles
+	useclass creators
+	name Doodles
+	artist Foote and Sack
+end
 ###########
 #end creators
 #universaluclick
@@ -2477,122 +2471,28 @@ strip merlinsworldofmarvels
 end
 ########
 #end universaluclick
+########
 #comicspage.com strips
 #XXXX need to check this section
 ########
-strip brenda
-	name Brenda Starr
-	useclass comicspage-strips-gen
-	$1 brenda
-	$2 bsr
-end
-strip doodles
-	name Doodles
-	useclass comicspage-strips-gen
-	$1 profdoodles
-	$2 dod
-end
-strip helen
-	name Helen, Sweetheart of the Internet
-	useclass comicspage-strips-gen
-	$1 helen
-	$2 hln
-end
-strip kudzu
-	name Kudzu
-	useclass comicspage-strips-gen
-	$1 kudzu
-	$2 kdz
-end
-strip lewis
-	name Lewis
-	useclass comicspage-strips-gen
-	$1 lewis
-	$2 lew
-end
-strip meehan
-	name Meehan Streak
-	useclass comicspage-strips-gen
-	$1 meehan
-	$2 mst
-end
-strip mixedmedia
-	name Mixed Media
-	useclass comicspage-strips-gen
-	$1 mixedmedia
-	$2 mix
-end
-strip monkeyhouse
-	name Monkeyhouse
-	useclass comicspage-strips-gen
-	$1 monkeyhouse
-	$2 mhs
-end
-strip willynethel
-	name Willy 'n' Ethel
-	useclass comicspage-strips-gen
-	$1 willynethel
-	$2 wil
-end
-strip computoon
-	name Compu-toon
-	useclass comicspage-panels-gen
-	$1 computoon
-	$2 cpt
-end
 strip loveis
 	name Love Is...
-	useclass comicspage-panels-gen
-	$1 loveis
-	$2 lis
-end
-strip conrad
-	name Paul Conrad
-	useclass comicspage-editorial-gen
-	$1 conrad
-	$2 con
+	type search
+	homepage http://loveiscomix.com
+	searchpattern /static/loveisbnk/\d{8}\.gif
+	baseurl http://loveiscomix.com
 end
 strip horsey
 	name David Horsey
-	useclass comicspage-editorial-gen
-	$1 horsey
-	$2 hor
-end
-strip jones
-	name Taylor Jones
-	useclass comicspage-editorial-gen
-	$1 jones
-	$2 jon
-end
-strip locher
-	name Dick Locher
-	useclass comicspage-editorial-gen
-	$1 locher
-	$2 dik
-end
-strip lowe
-	name Chan Lowe
-	useclass comicspage-editorial-gen
-	$1 lowe
-	$2 low
-end
-strip marlette
-	name Doug Marlette
-	useclass comicspage-editorial-gen
-	$1 marlette
-	$2 mar
+	searchpage http://www.latimes.com/opinion/topoftheticket/la-tot-cartoons-pg-photogallery.html
+	type search
+	searchpattern http://www.trbimg.com/img-.{8}/turbine/[a-zA-Z0-9\-]+\-001
 end
 strip peters
 	name Mike Peters
-	useclass comicspage-editorial-gen
-	$1 peters
-	$2 pet
-end
-strip stayskal
-	name Wayne Stayskal
-	useclass comicspage-editorial-gen
-	$1 stayskal
-	$2 sty
+	type generate
+	imageurl http://www.grimmy.com/images/MP_Archive/MP_%Y/MP-%Y-%m-%d.gif
+	homepage http://www.grimmy.com/editorials.php
 end
 strip telnaes
 	name Ann Telnaes
@@ -2600,23 +2500,38 @@ strip telnaes
 	$1 telnaes
 	$2 tel
 end
-strip wrightd
-	name Dick Wright
-	useclass comicspage-editorial-gen
-	$1 wrightd
-	$2 dwr
-end
 strip wright
+	#tms - need to find
 	name Don Wright
-	useclass comicspage-editorial-gen
-	$1 wright
-	$2 wrt
 end
 #additional non-standard strips
+class boffo
+	artist Joe Martin
+	type generate
+	imageurl http://www.mrboffo.com/comicsweb/$url/strips/%Y%m%d$id_web.jpg
+end
 strip catswithhands
 	name Cats with Hands
-	type generate
-	imageurl http://www.mrboffo.com/comicsweb/catswithhandsweb/strips/%Y%m%dcwh_s_web.jpg
+	useclass boffo
+	$url catswithhandsweb
+	$id cwh_s
+end
+strip willynethel
+	name Willy 'n' Ethel
+	useclass boffo
+	$url willynethelweb
+	$id wne_s
+end
+strip ontheedge
+	name On The Edge
+	$url ontheedgeweb
+	$id edge
+	useclass boffo
+end
+strip mrboffo
+	name Mr. Boffo
+	$url mrboffoweb
+	$id bfo_s
 end
 strip dwanepowell
 	#I think this will always be the last image in the queue (and the most recent)
@@ -2847,14 +2762,6 @@ strip tasteslikegravel
 	homepage http://www.tasteslikegravel.com/
 	type generate
 	imageurl http://www.tasteslikegravel.com/strips/%Y%m%d.png
-	provides any
-end
-strip instantclassic
-	name Instant Classic
-	artist Brian Carroll
-	homepage http://www.briworld.com
-	type generate
-	imageurl http://www.briworld.com/ICimages/IC%Y%m%d.jpg
 	provides any
 end
 strip reallife
@@ -3175,18 +3082,8 @@ end
 strip nukees
 	name Nukees
 	homepage http://www.nukees.com
-	type search
-	searchpattern <IMG.+?SRC="(/comics/\d+\..+?)"
-	baseurl http://www.nukees.com/
-	provides latest
-end
-strip joeaverage
-	name Joe Average
-	homepage http://www.joeaverage.org
-	type search
-	searchpattern <IMG.+?SRC="(/comics/\d+\..+?)"
-	baseurl http://www.joeaverage.org/
-	provides latest
+	type generate
+	imageurl http://www.nukees.com/comics/nukees%Y%m%d.gif
 end
 strip clanofthecats
 	name Clan of the cats
