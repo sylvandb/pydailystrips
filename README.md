@@ -20,9 +20,9 @@ optional arguments:
 
 
 Sample usage:
-$python pydailystrips dilbert, garfield, dennis-the-menace
-$python pydailystrips -i list_of_strips
-$python pydailystrips -i list_of_strips -o mypage.html
+  $python pydailystrips dilbert, garfield, dennis-the-menace
+  $python pydailystrips -i list_of_strips
+  $python pydailystrips -i list_of_strips -o mypage.html
 
 Requirements:
 * Runs in Python 2.7. I have gotten it to work in Python 2.6 also, but you have to install argparse manually as it isn't included in 2.6 by default.
