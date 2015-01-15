@@ -1,10 +1,18 @@
-import sys, getopt, time, urllib2, re, argparse
+#!/usr/bin/python
+
+import sys, getopt, time, urllib2, re, argparse, os
 
 #TODO: 
 #alt tags?
 #check version, link to update if not up to date
+#--local -- optimize if image file already exists
 
-outfile = ""
+localcp = False
+dailydir = False
+stripdir = False
+UserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/37.0.2062.120 Chrome/37.0.2062.120 Safari/537.36"
+outfile = "index.html"
+
 
 def classType(name, data, cl):
 	newstrip = {}
@@ -39,51 +47,88 @@ def getTitle(data):
 	if (data.get('homepage')):
 		txt +='<b><a href=\"%s\">%s</a></b>' %(stringsubs(data.get('homepage')), data.get('name'))
 	else:
-		txt += '<b>%s</b>' %(stringsubs(str(data.get('name'))))
+		txt += '<b>%s</b>' %(data.get('name'))
 	return txt
 
+def httpRequest(url, referer):
+	errtxt = None
+	request = urllib2.Request(url)
+	request.add_header("User-Agent", UserAgent)
+	request.add_header("Accept", "text/html")
+	request.add_header('Pragma', 'no-cache')
+	request.add_header('Cache-Control', 'no-cache')
+	request.add_header('Accept-Language', 'en-US,en;q=0.8')
+	if referer:
+		request.add_header("Referer", referer)
+	try:
+		resp = urllib2.urlopen(request)
+		data = resp.read()
+	except urllib2.HTTPError as err:
+		if err.code == 404:
+			errtxt = '404 error trying to access %s.<br /><br />\n\n' %(url)
+		else:
+			errtxt = 'error when trying to get %s. Server returned a %s error which means %s<br /><br />\n\n' %(url, err.code, err.reason)
+	except:
+		errtxt = 'an unknown error occured while trying to access %s<br /><br/>\n\n' %(url)
+	return data,errtxt
+
+def imageLocalCp(name, url, referer):
+	image = None
+	imgdata, errtxt = httpRequest(url, referer)
+	if imgdata:
+		ext = \
+			".gif" if imgdata[0:6] == "GIF87a" or imgdata[0:6] == "GIF89a" else \
+			".jpg" if imgdata[0:2] == "\xff\xd8" else \
+			".png" if imgdata[0:8] == "\x89PNG\r\n\x1A\n" else \
+			".bmp" if imgdata[0:2] == "BM" else \
+			""
+		today = stringsubs('%Y.%m.%d')
+		if dailydir:
+			dname = today
+			fname = name
+		elif stripdir:
+			dname = name
+			fname = today
+		else:
+			dname = 'tmp'
+			fname = '%s-%s' % (name, today)
+		try:
+			os.mkdir(dname)
+		except OSError:
+			pass
+		pname = "%s/%s%s" % (dname, fname, ext)
+		with open(pname, 'wb') as f:
+			f.write(imgdata)
+		image = pname.replace(" ","%20")
+	return image,errtxt
+
 def stripType(name, data):
-	html = getTitle(data)+getArtist(data)+"<br />\n"
+	image = ""
+	errtxt = ""
+	html = "%s%s<br />\n" % (getTitle(data), getArtist(data))
 	if (data['type'].startswith('search')):
 		url = data.get('homepage')
 		if (data.get('searchpage')):
 			url = data.get('searchpage')
 		url = stringsubs(url)
-		request = urllib2.Request(url)
-		request.add_header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/37.0.2062.120 Chrome/37.0.2062.120 Safari/537.36") 
-		request.add_header("Accept", "text/html")
-		request.add_header('Pragma', 'no-cache')
-		request.add_header('Cache-Control', 'no-cache')
-		request.add_header('Accept-Language', 'en-US,en;q=0.8')
-		if (data.get('referer')):
-			request.add_header("Referer", data.get('referer'))
-		try:
-			resp = urllib2.urlopen(request)
-			page = resp.read()
+		page, errtxt = httpRequest(url, data.get('referer'))
+		if page:
 			pattern = re.compile(data.get('searchpattern'))
 			m = pattern.search(page)
 			if (m):
-				html += "<img src=\""
-				if (data.get('baseurl')):
-					html += str(data.get('baseurl'))+m.group()
-				else:
-					html += m.group()
-				html += "\" /><br /><br />\n\n"
+				image = "%s%s" % (data.get('baseurl') or "", m.group())
 			else:
 				html += 'Could not find regex in page %s<br /><br />\n' %(url)
-		except urllib2.HTTPError, err:
-			if err.code == 404:
-				html += '404 error trying to access %s.<br /><br />\n\n' %(url)
-			else:
-				html += 'error when trying to get %s. Server returned a %s error which means %s<br /><br />\n\n' %(url, err.code, err.reason)
-		except:
-			html += 'an unknown error occured while trying to access %s<br /><br/>\n\n' %(url)
+		else:
+			html += errtxt
 	elif (data['type'].startswith('generate')):
-		image = data['imageurl']
-		html += "<img src=\""+stringsubs(image)+"\" /><br />\n\n"
+		image = stringsubs(data['imageurl'])
 	else:
-		return html+"Say what? Couldn't understand the strip type<br />\n"
-	return html
+		html += "Say what? Couldn't understand the strip type<br />\n"
+	print "Local:",localcp,stripdir,dailydir
+	if image and localcp:
+		image, errtxt = imageLocalCp(data.get('name'), image, data.get('referer'))
+	return "%s<img src=\"%s\" /><br />\n\n" % (html, image) if image else "%s%s" % (html, errtxt)
 
 def stringsubs(image):
 	image = str.replace(image, "%Y",time.strftime("%Y"))
@@ -93,21 +138,22 @@ def stringsubs(image):
 	return image
 
 def getStrips(toget, strips):
-	for s in toget:
-		if (s in strips):
-			strip = strips.get(s)
-			if ('useclass' in strip):
-				html = classType(s, strip, strips.get(strip['useclass']))
-			elif('type' in strip):
-				html = stripType(s, strip)
+	with open(outfile, "a") as myfile:
+		for s in toget:
+			try:
+				strip = strips[s]
+			except KeyError:
+				html = 'Could not find strip %s in strips.def file' %(s)
+				print html
+				html += '<br />\n\n'
 			else:
-				html = "could not understand strip definition.<br />\n\n"		
-			with open(outfile, "a") as myfile:
-				myfile.write(html)
-		else:
-			with open(outfile, "a") as myfile:
-				myfile.write('Could not find strip %s in strips.def file<br />\n\n' %(s))
-				print 'Could not find strip %s in strips.def file' %(s)
+				if ('useclass' in strip):
+					html = classType(s, strip, strips.get(strip['useclass']))
+				elif ('type' in strip):
+					html = stripType(s, strip)
+				else:
+					html = "could not understand strip definition.<br />\n\n"		
+			myfile.write(html)
 def init(deffile):
 	strips = {}
 	with open(deffile, "r") as defs:
@@ -157,12 +203,13 @@ def loadFromFile(filename):
 def main(argv):
 	#will call app with list of strips and possible opts
 	#process some options (output, input)
-	infile = ""
-	global outfile
-	outfile = "index.html"
+	global outfile,localcp,dailydir,stripdir
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-o", "--output", help="output file to write to")
 	parser.add_argument("-i", "--input", help="input file to read from")
+	parser.add_argument("-l", "--local", help="keep a copy (download) each strip", action="store_true")
+	parser.add_argument("-d", "--dailydir", help="create a directory each day", action="store_true")
+	parser.add_argument("--stripdir", help="create a directory for each strip", action="store_true")
 	parser.add_argument("-v", "--version", help="print version and exit", action="store_true")
 	parser.add_argument("--defs", help="Path to the strip definition file")
 	parser.add_argument("strips", metavar='strips', nargs='*', help='strips to load, separated by spaces')
@@ -170,28 +217,24 @@ def main(argv):
 	if (args.version):
 		print "Are you kidding? This isn't even beta. What are you even doing looking at this?"
 		exit(0)
-	if (args.input):
-    		infile = args.input
-	if (args.output):
-		outfile = args.output
-	if (args.defs):
-		deffile = args.defs
-	else :
-		deffile = 'strips.def'
-	#load classes from def file
-	strips = init(deffile)
+	outfile = args.output or outfile
+	localcp = args.local
+	dailydir = args.dailydir
+	stripdir = args.stripdir
 
-	toget = []
-	if (infile):
-		toget = loadFromFile(infile)
-	else:
-		toget = args.strips
+	#load classes from def file
+	strips = init(args.defs or 'strips.def')
+
+	toget = loadFromFile(args.input) if (args.input) else args.strips
 
 	printHeader()
 	getStrips(toget, strips)
 	printFooter()
 
-main(sys.argv)
+
+
+if __name__ == '__main__':
+	main(sys.argv)
 
 #other options I might consider supporting (from dailystrips)
 #   quiet|q  verbose   local|l   noindex   archive|a   dailydir|d   stripdir   save|s
