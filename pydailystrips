@@ -5,13 +5,17 @@ import sys, getopt, time, urllib2, re, argparse, os
 #TODO:
 #alt tags?
 #check version, link to update if not up to date
-#--local -- optimize if image file already exists
 
 localcp = False
 dailydir = False
 stripdir = False
 outfile = "index.html"
 UserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/37.0.2062.120 Chrome/37.0.2062.120 Safari/537.36"
+timestamp = None
+
+# minimum size to consider a valid image download,
+# extension type test will look at up to 8 bytes
+MINSIZE = 512
 
 
 def classType(data, cl):
@@ -62,35 +66,62 @@ def httpRequest(url, referer):
 	return data,errtxt
 
 
+def dirNfileName(name, theday):
+	date = time.strftime('%Y.%m.%d', time.localtime(theday))
+	if dailydir:
+		dname = date
+		fname = name
+	elif stripdir:
+		dname = name
+		fname = date
+	else:
+		dname = 'tmp'
+		fname = '%s-%s' % (name, date)
+	return dname, fname
+
+def duplicateOfYesterday(imgtoday, name, ext):
+	dname, fname = dirNfileName(name, timestamp - 86400)
+	pname = "%s/%s%s" % (dname, fname, ext)
+	try:
+		with open(pname, 'rb') as f:
+			imgyesterday = f.read()
+	except (OSError, IOError):
+		imgyesterday = ''
+	return len(imgtoday) == len(imgyesterday) and imgtoday == imgyesterday
+
 def imageLocalCp(name, url, referer):
-	image = None
+	dname, fname = dirNfileName(name, timestamp)
+	for ext in (".gif", ".jpg", ".png", ".bmp", ""):
+		pname = "%s/%s%s" % (dname, fname, ext)
+		if os.path.exists(pname):
+			return pname, ""
+
+	pname = None
 	imgdata, errtxt = httpRequest(url, referer)
-	if imgdata:
+
+	if imgdata and len(imgdata) < MINSIZE:
+		errtxt = 'Retrieved image was too small'
+
+	elif imgdata:
 		ext = \
 			".gif" if imgdata[0:6] == "GIF87a" or imgdata[0:6] == "GIF89a" else \
 			".jpg" if imgdata[0:2] == "\xff\xd8" else \
 			".png" if imgdata[0:8] == "\x89PNG\r\n\x1A\n" else \
 			".bmp" if imgdata[0:2] == "BM" else \
 			""
-		today = stringsubs('%Y.%m.%d')
-		if dailydir:
-			dname = today
-			fname = name
-		elif stripdir:
-			dname = name
-			fname = today
+		if duplicateOfYesterday(imgdata, name, ext):
+			errtxt = 'Retrieved image was the same as yesterday'
 		else:
-			dname = 'tmp'
-			fname = '%s-%s' % (name, today)
-		try:
-			os.mkdir(dname)
-		except OSError:
-			pass
-		pname = "%s/%s%s" % (dname, fname, ext)
-		with open(pname, 'wb') as f:
-			f.write(imgdata)
-		image = pname.replace(" ","%20")
-	return image,errtxt
+			try:
+				os.mkdir(dname)
+			except OSError:
+				pass
+			pname = "%s/%s%s" % (dname, fname, ext)
+			with open(pname, 'wb') as f:
+				f.write(imgdata)
+
+	return pname,errtxt
+
 
 def replaceVars(data):
 	strip = {}
@@ -116,10 +147,7 @@ def stripType(stripdef):
 	errtxt = ""
 	html = "%s%s<br />\n" % (getTitle(data), getArtist(data))
 	if (data['type'].startswith('search')):
-		url = data.get('homepage')
-		if (data.get('searchpage')):
-			url = data.get('searchpage')
-		url = stringsubs(url)
+		url = stringsubs(data.get('searchpage') or data.get('homepage'))
 		page, errtxt = httpRequest(url, data.get('referer'))
 		if page:
 			pattern = re.compile(data.get('searchpattern'))
@@ -127,27 +155,28 @@ def stripType(stripdef):
 			if (m):
 				image = "%s%s" % (data.get('baseurl') or "", m.group())
 			else:
-				html += 'Could not find regex in page %s<br /><br />\n' %(url)
+				html += 'Could not find regex in page %s' %(url)
 		else:
-			html += errtxt
+			html += 'Search page failed: %s' % errtxt
+			errtxt = ""
 	elif (data['type'].startswith('generate')):
 		image = stringsubs(data['imageurl'])
 	else:
-		html += "Say what? Couldn't understand the strip type<br />\n"
+		html += "Say what? Couldn't understand the strip type"
 	#print "Local:",localcp,stripdir,dailydir
 	if image and localcp:
 		image, errtxt = imageLocalCp(data.get('name'), image, data.get('referer'))
-	return "%s<img src=\"%s\" /><br />\n\n" % (html, image) if image \
+	return "%s<img src=\"%s\" /><br />\n\n" % (html, image.replace(" ","%20")) if image \
 		else "%s%s<br />\n\n" % (html, errtxt)
 
 
 
-
 def stringsubs(image):
-	image = str.replace(image, "%Y",time.strftime("%Y"))
-	image = str.replace(image, "%y",time.strftime("%y"))
-	image = str.replace(image, "%m",time.strftime("%m"))
-	image = str.replace(image, "%d",time.strftime("%d"))
+	ltm = time.localtime(timestamp)
+	image = image.replace("%Y", time.strftime("%Y", ltm))
+	image = image.replace("%y", time.strftime("%y", ltm))
+	image = image.replace("%m", time.strftime("%m", ltm))
+	image = image.replace("%d", time.strftime("%d", ltm))
 	return image
 
 
@@ -166,7 +195,7 @@ def getStrips(toget, strips):
 				elif ('type' in strip):
 					html = stripType(strip)
 				else:
-					html = "could not understand strip definition.<br />\n\n"		
+					html = "could not understand strip definition.<br />\n\n"
 			myfile.write(html)
 
 
@@ -206,13 +235,13 @@ def init(deffile):
 
 def printFooter():
 	with open(outfile, "a") as myfile:
-		myfile.write("generated at "+time.asctime(time.localtime(time.time()))+"<br />\n")
+		myfile.write("<br /><br />\ngenerated at %s<br />\n" % time.asctime(time.localtime(timestamp)))
 		myfile.write("powered by <a href=\"https://github.com/bachrach44/pydailystrips\">py daily strips</a>\n</body></html>\n")
 
 
 def printHeader():
 	with open(outfile, "w") as myfile:
-		myfile.write("<html><head><title>Python Daily Strips</title></head>\n<body><b><font size=4><center>Python Daily Strips for %s, %s</center></font></b><br /><br />\n\n" %(time.strftime("%A"), time.strftime("%b %d %Y")))
+		myfile.write("<html><head><title>Python Daily Strips</title></head>\n<body><b><font size=4><center>Python Daily Strips for %s</center></font></b><br /><br />\n\n" %(time.strftime("%A, %b %d %Y", time.localtime(timestamp))))
 
 
 
@@ -223,7 +252,7 @@ def loadFromFile(filename):
 
 
 def main(argv):
-	global outfile,localcp,dailydir,stripdir
+	global outfile, localcp, dailydir, stripdir, timestamp
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-o", "--output", help="output file to write to")
 	parser.add_argument("-i", "--input", help="input file to read from")
@@ -244,6 +273,9 @@ def main(argv):
 
 	#load classes from def file
 	strips = init(args.defs or 'strips.def')
+
+	# use a consistent timestamp for the entire execution
+	timestamp = time.time()
 
 	toget = loadFromFile(args.input) if (args.input) else args.strips
 
